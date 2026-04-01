@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#ff6b9d">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="ANGJOK Fit">
+<title>ANGJOK — Fitness Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --pink: #ff6b9d;
+    --pink2: #ff3d7f;
+    --bg: #0b0b0b;
+    --card: #161616;
+    --border: #252525;
+    --border2: #1e1e1e;
+    --text: #e0e0e0;
+    --muted: #555;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    font-family: 'DM Sans', sans-serif;
+    color: var(--text);
+    min-height: 100vh;
+    padding: 24px 16px 100px;
+  }
+
+  .container { max-width: 1100px; margin: 0 auto; }
+
+  /* HEADER */
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 32px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .month {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 72px;
+    color: var(--pink);
+    letter-spacing: 6px;
+    line-height: 1;
+  }
+
+  .sub-name {
+    font-size: 13px;
+    color: var(--muted);
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    margin-top: 6px;
+  }
+
+  .tagline {
+    font-size: 11px;
+    color: #333;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-top: 3px;
+  }
+
+  .stats-row { display: flex; gap: 14px; }
+
+  .stat-box {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 14px 20px;
+    text-align: center;
+    min-width: 88px;
+  }
+
+  .stat-val {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 32px;
+    color: var(--pink);
+    letter-spacing: 2px;
+    line-height: 1;
+  }
+
+  .stat-lbl {
+    font-size: 9px;
+    color: var(--muted);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-top: 4px;
+  }
+
+  /* TABS */
+  .tabs { display: flex; gap: 10px; margin-bottom: 24px; }
+
+  .tab {
+    padding: 10px 26px;
+    border-radius: 30px;
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    transition: all 0.2s;
+  }
+
+  .tab:hover { color: var(--text); border-color: #333; }
+
+  .tab.active {
+    background: var(--pink);
+    color: #fff;
+    border-color: var(--pink);
+  }
+
+  .hidden { display: none !important; }
+
+  /* TRACKER GRID */
+  .tracker-wrap {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    overflow: auto;
+    margin-bottom: 24px;
+  }
+
+  .grid-table { min-width: 100%; border-collapse: collapse; }
+
+  .th-habit {
+    padding: 14px 20px;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    text-align: left;
+    min-width: 230px;
+    border-right: 1px solid var(--border);
+    white-space: nowrap;
+    background: #0e0e0e;
+  }
+
+  .th-day {
+    text-align: center;
+    font-size: 11px;
+    color: var(--muted);
+    padding: 14px 4px;
+    min-width: 34px;
+    border-right: 1px solid var(--border2);
+    font-weight: 600;
+    background: #0e0e0e;
+  }
+
+  .th-day.today { color: var(--pink); }
+
+  .grid-table tbody tr {
+    border-bottom: 1px solid var(--border2);
+    transition: background 0.15s;
+  }
+
+  .grid-table tbody tr:last-child { border-bottom: none; }
+  .grid-table tbody tr:hover { background: #1c1c1c; }
+
+  .td-habit {
+    padding: 0 20px;
+    border-right: 1px solid var(--border);
+    height: 52px;
+    white-space: nowrap;
+  }
+
+  .habit-inner { display: flex; align-items: center; gap: 12px; }
+  .h-icon { font-size: 18px; }
+  .h-name { font-size: 13px; color: #ccc; font-weight: 500; }
+
+  .td-tick {
+    text-align: center;
+    height: 52px;
+    width: 34px;
+    border-right: 1px solid var(--border2);
+    cursor: pointer;
+    transition: background 0.1s;
+    vertical-align: middle;
+  }
+
+  .td-tick:hover:not(.future) { background: #202020; }
+
+  .td-tick.done { background: rgba(255,107,157,0.08); }
+
+  .td-tick.done::after {
+    content: '✓';
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--pink);
+    display: block;
+    line-height: 52px;
+  }
+
+  .td-tick.today-col { background: rgba(255,107,157,0.03); }
+  .td-tick.today-col.done { background: rgba(255,107,157,0.14); }
+  .td-tick.future { cursor: default; opacity: 0.2; }
+
+  /* WEIGHT LOG */
+  .weight-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 28px;
+    margin-bottom: 24px;
+    overflow-x: auto;
+  }
+
+  .section-lbl {
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+
+  .weight-grid {
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    gap: 8px;
+  }
+
+  .weight-day-box {
+    background: #1a1a1a;
+    border: 1px solid #222;
+    border-radius: 10px;
+    padding: 8px 6px;
+    text-align: center;
+    transition: border-color 0.2s;
+  }
+
+  .weight-day-box.has-data { border-color: var(--pink); }
+  .weight-day-box.future-day { opacity: 0.3; }
+
+  .wd-num {
+    font-size: 10px;
+    color: var(--muted);
+    margin-bottom: 4px;
+    font-weight: 600;
+  }
+
+  .wd-input {
+    width: 100%;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid #333;
+    color: var(--pink);
+    font-size: 12px;
+    font-weight: 700;
+    text-align: center;
+    font-family: 'DM Sans', sans-serif;
+    outline: none;
+    padding: 2px 0;
+  }
+
+  .wd-input:focus { border-bottom-color: var(--pink); }
+  .wd-input::placeholder { color: #333; font-size: 11px; }
+
+  /* GRAPH */
+  .graph-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 28px;
+    margin-bottom: 20px;
+  }
+
+  canvas { width: 100%; display: block; }
+
+  /* DIET CARD */
+  .diet-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 28px;
+    margin-bottom: 24px;
+  }
+
+  .diet-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 14px;
+    margin-top: 16px;
+  }
+
+  .meal-box {
+    background: #1a1a1a;
+    border: 1px solid #222;
+    border-radius: 14px;
+    padding: 16px;
+  }
+
+  .meal-time {
+    font-size: 11px;
+    color: var(--pink);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+
+  .meal-item {
+    font-size: 12px;
+    color: #777;
+    padding: 4px 0;
+    border-bottom: 1px solid #222;
+    display: flex;
+    gap: 6px;
+  }
+
+  .meal-item:last-child { border-bottom: none; }
+  .meal-item::before { content: '·'; color: var(--pink); font-size: 16px; line-height: 1; }
+
+  /* RULES */
+  .rules-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 28px;
+    margin-bottom: 24px;
+  }
+
+  .rules-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0 32px;
+    margin-top: 16px;
+  }
+
+  .rule-row {
+    display: flex;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px dashed #1e1e1e;
+    align-items: flex-start;
+  }
+
+  .rule-row:last-child { border-bottom: none; }
+
+  .rnum {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    color: var(--pink);
+    line-height: 1;
+    flex-shrink: 0;
+  }
+
+  .rtxt { font-size: 13px; color: #777; line-height: 1.4; padding-top: 2px; }
+
+  /* FOOTER */
+  .footer-bar {
+    margin-top: 28px;
+    padding: 18px 28px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .goal {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 24px;
+    color: var(--pink);
+    letter-spacing: 3px;
+  }
+
+  .goal-sub {
+    font-size: 11px;
+    color: #333;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-top: 4px;
+  }
+
+  .ring-wrap { display: flex; align-items: center; gap: 16px; }
+
+  .ring-label { text-align: right; }
+
+  .ring-label .big {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 32px;
+    color: var(--pink);
+    letter-spacing: 2px;
+    line-height: 1;
+  }
+
+  .ring-label .small {
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- MOTIVATION BANNER -->
+  <div style="background:linear-gradient(135deg,#ff3d7f,#ff6b9d);border-radius:16px;padding:14px 20px;margin-bottom:20px;display:flex;align-items:center;gap:14px;">
+    <div style="font-size:36px;">💪</div>
+    <div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:#fff;letter-spacing:3px;">ANGJOK, TU KAR SAKTI HAI! 🔥</div>
+      <div id="motiveLine" style="font-size:12px;color:rgba(255,255,255,0.85);margin-top:2px;"></div>
+    </div>
+  </div>
+
+  <!-- HEADER -->
+  <div class="header">
+    <div>
+      <div style="font-size:12px;color:var(--muted);letter-spacing:3px;text-transform:uppercase;margin-bottom:4px;">ANGJOK ki</div>
+      <div class="month">FITNESS JOURNEY</div>
+      <div class="sub-name">April 2026 • Strong is Beautiful 💪🌸</div>
+    </div>
+    <div class="stats-row">
+      <div class="stat-box">
+        <div class="stat-val" id="statToday">0/8</div>
+        <div class="stat-lbl">Today</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-val" id="statStreak">0</div>
+        <div class="stat-lbl">Streak 🔥</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-val" id="statLost">0kg</div>
+        <div class="stat-lbl">Lost 📉</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-val" id="statMonth">0%</div>
+        <div class="stat-lbl">Month %</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab active" onclick="showTab('tracker', this)">📋 Habits</button>
+    <button class="tab" onclick="showTab('weight', this)">⚖️ Weight Log</button>
+    <button class="tab" onclick="showTab('graph', this)">📈 Progress</button>
+    <button class="tab" onclick="showTab('diet', this)">🥗 Diet Plan</button>
+  </div>
+
+  <!-- TRACKER TAB -->
+  <div id="tab-tracker">
+    <div class="tracker-wrap">
+      <table class="grid-table" id="gridTable"></table>
+    </div>
+  </div>
+
+  <!-- WEIGHT LOG TAB -->
+  <div id="tab-weight" class="hidden">
+    <div class="weight-card">
+      <div class="section-lbl">⚖️ Log your weight daily (in kg) — tap on each day box</div>
+      <div class="weight-grid" id="weightGrid"></div>
+    </div>
+  </div>
+
+  <!-- GRAPH TAB -->
+  <div id="tab-graph" class="hidden">
+    <div class="graph-card">
+      <div class="section-lbl">📊 Daily Habits Completed — April 2026</div>
+      <canvas id="chartHabits" height="260"></canvas>
+    </div>
+    <div class="graph-card">
+      <div class="section-lbl">⚖️ Weight Progress — April 2026</div>
+      <canvas id="chartWeight" height="260"></canvas>
+    </div>
+    <div class="graph-card">
+      <div class="section-lbl">🏆 Per Habit Completion Rate</div>
+      <canvas id="chartPerHabit" height="320"></canvas>
+    </div>
+  </div>
+
+  <!-- DIET TAB -->
+  <div id="tab-diet" class="hidden">
+    <div class="diet-card">
+      <div class="section-lbl">🥗 Daily Diet Plan — Simple & Realistic</div>
+      <div class="diet-grid">
+        <div class="meal-box">
+          <div class="meal-time">☀️ Subah (Morning)</div>
+          <div class="meal-item">Garam paani + nimbu (khaali pet)</div>
+          <div class="meal-item">2 ande / poha / oats</div>
+          <div class="meal-item">1 fal — kela ya seb</div>
+          <div class="meal-item">Bina cheeni chai / coffee</div>
+        </div>
+        <div class="meal-box">
+          <div class="meal-time">🌤️ Dopahar (Lunch)</div>
+          <div class="meal-item">Chawal + dal + sabzi (normal)</div>
+          <div class="meal-item">Thoda kam khao — pet bhar ke nahi</div>
+          <div class="meal-item">Salad lelo agar ho sake</div>
+          <div class="meal-item">Khaane se pehle paani piyo</div>
+        </div>
+        <div class="meal-box">
+          <div class="meal-time">🌙 Raat (Dinner)</div>
+          <div class="meal-item">Halka khaana — roti + sabzi</div>
+          <div class="meal-item">Raat ko chawal nahi</div>
+          <div class="meal-item">Dinner raat 8 baje se pehle</div>
+          <div class="meal-item">Dinner ke baad kuch nahi</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="rules-card">
+      <div class="section-lbl">📋 Golden Rules</div>
+      <div class="rules-grid">
+        <div class="rule-row"><div class="rnum">1</div><div class="rtxt">Din mein 8–10 glass paani piyo</div></div>
+        <div class="rule-row"><div class="rnum">2</div><div class="rtxt">Weekdays mein junk food nahi (weekend thodi chhoot hai)</div></div>
+        <div class="rule-row"><div class="rnum">3</div><div class="rtxt">Cold drink, juice packet, chips — bilkul nahi</div></div>
+        <div class="rule-row"><div class="rnum">4</div><div class="rtxt">7–8 ghante neend zaroori hai — weight loss ke liye</div></div>
+        <div class="rule-row"><div class="rnum">5</div><div class="rtxt">Breakfast kabhi mat chodo</div></div>
+        <div class="rule-row"><div class="rnum">6</div><div class="rtxt">Khaane ke baad thoda walk karo (5 min bhi chalega)</div></div>
+        <div class="rule-row"><div class="rnum">7</div><div class="rtxt">Khaate waqt phone ya TV mat dekho</div></div>
+        <div class="rule-row"><div class="rnum">8</div><div class="rtxt">Weight sirf Sunday ko check karo — roz nahi</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer-bar">
+    <div>
+      <div class="goal">TARGET: 60–65 KG 🎯</div>
+      <div class="goal-sub">Start: ~70kg • Timeline: 3–4 Months</div>
+    </div>
+    <div class="ring-wrap">
+      <div class="ring-label">
+        <div class="big" id="footerPct">0%</div>
+        <div class="small">Month Habits</div>
+      </div>
+      <svg width="60" height="60" viewBox="0 0 60 60">
+        <circle cx="30" cy="30" r="24" fill="none" stroke="#1e1e1e" stroke-width="6"/>
+        <circle id="ringCircle" cx="30" cy="30" r="24" fill="none" stroke="#ff6b9d"
+          stroke-width="6" stroke-linecap="round"
+          stroke-dasharray="150.8" stroke-dashoffset="150.8"
+          transform="rotate(-90 30 30)" style="transition:stroke-dashoffset 0.6s ease"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- INSTALL BANNER -->
+  <div id="installBanner" style="display:none;position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#ff6b9d;color:#fff;border-radius:30px;padding:12px 24px;font-size:13px;font-weight:700;letter-spacing:1px;cursor:pointer;z-index:999;box-shadow:0 4px 20px rgba(255,107,157,0.5);white-space:nowrap;" onclick="installApp()">
+    📲 Home Screen pe Add Karo!
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <div style="position:fixed;bottom:0;left:0;right:0;background:#0f0f0f;border-top:1px solid #222;display:flex;justify-content:space-around;padding:10px 0 16px;z-index:100;">
+    <button onclick="showTabNav('tracker',this)" class="bnav" id="nav-tracker" style="background:none;border:none;color:#ff6b9d;font-size:22px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;">
+      📋<span style="font-size:9px;letter-spacing:1px;color:inherit;">HABITS</span>
+    </button>
+    <button onclick="showTabNav('weight',this)" class="bnav" id="nav-weight" style="background:none;border:none;color:#555;font-size:22px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;">
+      ⚖️<span style="font-size:9px;letter-spacing:1px;color:inherit;">WEIGHT</span>
+    </button>
+    <button onclick="showTabNav('graph',this)" class="bnav" id="nav-graph" style="background:none;border:none;color:#555;font-size:22px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;">
+      📈<span style="font-size:9px;letter-spacing:1px;color:inherit;">PROGRESS</span>
+    </button>
+    <button onclick="showTabNav('diet',this)" class="bnav" id="nav-diet" style="background:none;border:none;color:#555;font-size:22px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;">
+      🥗<span style="font-size:9px;letter-spacing:1px;color:inherit;">DIET</span>
+    </button>
+  </div>
+
+</div>
+
+<script>
+const HABITS = [
+  { icon: '🦵', name: 'Squats — 15 baar × 3 sets' },
+  { icon: '🤸', name: 'Jumping Jacks — 30 baar × 3 sets' },
+  { icon: '🧎', name: 'Lunges — 12 baar × 3 sets (dono pair)' },
+  { icon: '🪨', name: 'Plank — 30 sec ruko × 3 baar' },
+  { icon: '💃', name: 'Skipping ya Dance — 15 min' },
+  { icon: '💧', name: 'Paani — 8 se 10 glass poora din' },
+  { icon: '🥗', name: 'Junk food nahi khaya aaj' },
+  { icon: '😴', name: 'Neend — 7 se 8 ghante puri' },
+];
+
+const DAYS = 30;
+const TODAY = Math.min(Math.max(new Date().getDate(), 1), 30);
+
+let ticks = {};
+let weightLog = {};
+
+try { ticks = JSON.parse(localStorage.getItem('wl_ticks') || '{}'); } catch(e){}
+try { weightLog = JSON.parse(localStorage.getItem('wl_weight') || '{}'); } catch(e){}
+
+function save() {
+  try {
+    localStorage.setItem('wl_ticks', JSON.stringify(ticks));
+    localStorage.setItem('wl_weight', JSON.stringify(weightLog));
+  } catch(e){}
+}
+
+function toggle(hi, d) {
+  const k = `${hi}_${d}`;
+  ticks[k] = !ticks[k];
+  save();
+  const cell = document.getElementById(`cell_${hi}_${d}`);
+  if (cell) cell.classList.toggle('done', !!ticks[k]);
+  updateStats();
+  const gTab = document.getElementById('tab-graph');
+  if (gTab && !gTab.classList.contains('hidden')) drawGraphs();
+}
+
+function saveWeight(d, val) {
+  weightLog[`w_${d}`] = val ? parseFloat(val) : null;
+  save();
+  updateStats();
+  const gTab = document.getElementById('tab-graph');
+  if (gTab && !gTab.classList.contains('hidden')) drawGraphs();
+
+  const box = document.getElementById(`wbox_${d}`);
+  if (box) box.classList.toggle('has-data', !!val);
+}
+
+/* BUILD TRACKER */
+function buildGrid() {
+  const t = document.getElementById('gridTable');
+  t.innerHTML = '';
+  const thead = t.createTHead();
+  const hrow = thead.insertRow();
+
+  const thh = document.createElement('th');
+  thh.className = 'th-habit';
+  thh.textContent = 'HABITS / DAYS';
+  hrow.appendChild(thh);
+
+  for (let d = 1; d <= DAYS; d++) {
+    const th = document.createElement('th');
+    th.className = 'th-day' + (d === TODAY ? ' today' : '');
+    th.textContent = d;
+    hrow.appendChild(th);
+  }
+
+  const tbody = t.createTBody();
+  HABITS.forEach((h, hi) => {
+    const tr = tbody.insertRow();
+    const tdH = tr.insertCell();
+    tdH.className = 'td-habit';
+    tdH.innerHTML = `<div class="habit-inner"><span class="h-icon">${h.icon}</span><span class="h-name">${h.name}</span></div>`;
+
+    for (let d = 1; d <= DAYS; d++) {
+      const td = tr.insertCell();
+      const isFuture = d > TODAY;
+      const isDone = !!ticks[`${hi}_${d}`];
+      td.id = `cell_${hi}_${d}`;
+      td.className = `td-tick${isDone ? ' done' : ''}${d === TODAY ? ' today-col' : ''}${isFuture ? ' future' : ''}`;
+      if (!isFuture) td.onclick = () => toggle(hi, d);
+    }
+  });
+}
+
+/* BUILD WEIGHT LOG */
+function buildWeightGrid() {
+  const g = document.getElementById('weightGrid');
+  g.innerHTML = '';
+  for (let d = 1; d <= DAYS; d++) {
+    const isFuture = d > TODAY;
+    const val = weightLog[`w_${d}`];
+    const box = document.createElement('div');
+    box.id = `wbox_${d}`;
+    box.className = `weight-day-box${val ? ' has-data' : ''}${isFuture ? ' future-day' : ''}`;
+    box.innerHTML = `
+      <div class="wd-num">Apr ${d}</div>
+      <input class="wd-input" type="number" step="0.1" min="40" max="120"
+        placeholder="kg" value="${val || ''}"
+        ${isFuture ? 'disabled' : ''}
+        onchange="saveWeight(${d}, this.value)"
+        onblur="saveWeight(${d}, this.value)"
+      />
+    `;
+    g.appendChild(box);
+  }
+}
+
+/* STATS */
+function updateStats() {
+  const todayDone = HABITS.filter((_, hi) => ticks[`${hi}_${TODAY}`]).length;
+  document.getElementById('statToday').textContent = `${todayDone}/${HABITS.length}`;
+
+  let streak = 0;
+  for (let d = TODAY; d >= 1; d--) {
+    const cnt = HABITS.filter((_, hi) => ticks[`${hi}_${d}`]).length;
+    if (cnt >= 6) streak++; else break;
+  }
+  document.getElementById('statStreak').textContent = streak;
+
+  // Weight lost
+  const weights = [];
+  for (let d = 1; d <= TODAY; d++) {
+    const v = weightLog[`w_${d}`];
+    if (v) weights.push({ d, v });
+  }
+  if (weights.length >= 2) {
+    const lost = weights[0].v - weights[weights.length - 1].v;
+    document.getElementById('statLost').textContent = (lost >= 0 ? '-' : '+') + Math.abs(lost).toFixed(1) + 'kg';
+  } else {
+    document.getElementById('statLost').textContent = '—';
+  }
+
+  let total = Object.values(ticks).filter(Boolean).length;
+  const possible = TODAY * HABITS.length;
+  const pct = possible > 0 ? Math.round((total / possible) * 100) : 0;
+  document.getElementById('statMonth').textContent = pct + '%';
+  document.getElementById('footerPct').textContent = pct + '%';
+
+  const circ = 150.8;
+  const ring = document.getElementById('ringCircle');
+  if (ring) ring.style.strokeDashoffset = circ - (pct / 100) * circ;
+}
+
+/* GRAPHS */
+function drawGraphs() {
+  drawHabitsChart();
+  drawWeightChart();
+  drawPerHabitChart();
+}
+
+function drawHabitsChart() {
+  const canvas = document.getElementById('chartHabits');
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = canvas.offsetWidth * dpr;
+  canvas.height = 260 * dpr;
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+  const W = canvas.offsetWidth, H = 260;
+  ctx.clearRect(0, 0, W, H);
+
+  const data = [];
+  for (let d = 1; d <= TODAY; d++) {
+    data.push(HABITS.filter((_, hi) => ticks[`${hi}_${d}`]).length);
+  }
+
+  if (!data.length) {
+    ctx.fillStyle = '#333'; ctx.font = '14px DM Sans';
+    ctx.fillText('Start ticking habits to see your graph! 💪', 20, H/2);
+    return;
+  }
+
+  const pad = { l: 32, r: 16, t: 20, b: 36 };
+  const gW = W - pad.l - pad.r, gH = H - pad.t - pad.b;
+  const MAX = HABITS.length;
+
+  [0, 2, 4, 6, 8].forEach(v => {
+    const y = pad.t + gH - (v / MAX) * gH;
+    ctx.strokeStyle = '#1c1c1c'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(pad.l, y); ctx.lineTo(pad.l + gW, y); ctx.stroke();
+    ctx.fillStyle = '#444'; ctx.font = '10px DM Sans';
+    ctx.fillText(v, 4, y + 4);
+  });
+
+  const bW = Math.max(6, (gW / DAYS) - 3);
+
+  data.forEach((val, i) => {
+    const d = i + 1;
+    const x = pad.l + (i / DAYS) * gW + ((gW/DAYS) - bW) / 2;
+    const bH = (val / MAX) * gH;
+    const y = pad.t + gH - bH;
+
+    const grad = ctx.createLinearGradient(0, y, 0, y + bH);
+    if (val === MAX) { grad.addColorStop(0, '#ffb3d0'); grad.addColorStop(1, '#ff6b9d'); }
+    else if (val >= 5) { grad.addColorStop(0, '#ff6b9d'); grad.addColorStop(1, '#ff3d7f'); }
+    else { grad.addColorStop(0, '#ff3d7f'); grad.addColorStop(1, '#cc0055'); }
+
+    ctx.fillStyle = grad;
+    ctx.beginPath(); ctx.roundRect(x, y, bW, bH, 4); ctx.fill();
+
+    if (val > 0) {
+      ctx.fillStyle = '#888'; ctx.font = '9px DM Sans';
+      ctx.fillText(val, x + bW/2 - 3, y - 4);
+    }
+
+    if (DAYS <= 15 || d % 5 === 0 || d === 1 || d === TODAY) {
+      ctx.fillStyle = d === TODAY ? '#ff6b9d' : '#444';
+      ctx.font = d === TODAY ? 'bold 10px DM Sans' : '10px DM Sans';
+      ctx.fillText(d, x + bW/2 - 4, H - 8);
+    }
+  });
+}
+
+function drawWeightChart() {
+  const canvas = document.getElementById('chartWeight');
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = canvas.offsetWidth * dpr;
+  canvas.height = 260 * dpr;
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+  const W = canvas.offsetWidth, H = 260;
+  ctx.clearRect(0, 0, W, H);
+
+  const points = [];
+  for (let d = 1; d <= DAYS; d++) {
+    const v = weightLog[`w_${d}`];
+    if (v) points.push({ d, v });
+  }
+
+  if (points.length < 1) {
+    ctx.fillStyle = '#333'; ctx.font = '14px DM Sans';
+    ctx.fillText('Log your weight to see the progress graph! ⚖️', 20, H/2);
+    return;
+  }
+
+  const pad = { l: 44, r: 20, t: 20, b: 36 };
+  const gW = W - pad.l - pad.r, gH = H - pad.t - pad.b;
+
+  const allVals = points.map(p => p.v);
+  const minV = Math.min(...allVals) - 1;
+  const maxV = Math.max(...allVals) + 1;
+  const range = maxV - minV;
+
+  // gridlines
+  for (let i = 0; i <= 4; i++) {
+    const v = minV + (range / 4) * i;
+    const y = pad.t + gH - ((v - minV) / range) * gH;
+    ctx.strokeStyle = '#1c1c1c'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(pad.l, y); ctx.lineTo(pad.l + gW, y); ctx.stroke();
+    ctx.fillStyle = '#444'; ctx.font = '10px DM Sans';
+    ctx.fillText(v.toFixed(1), 2, y + 4);
+  }
+
+  // target line at 65kg
+  if (65 >= minV && 65 <= maxV) {
+    const ty = pad.t + gH - ((65 - minV) / range) * gH;
+    ctx.strokeStyle = 'rgba(255,107,157,0.3)'; ctx.lineWidth = 1;
+    ctx.setLineDash([4, 4]);
+    ctx.beginPath(); ctx.moveTo(pad.l, ty); ctx.lineTo(pad.l + gW, ty); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = 'rgba(255,107,157,0.6)'; ctx.font = '10px DM Sans';
+    ctx.fillText('Target 65kg', pad.l + 4, ty - 4);
+  }
+
+  // line
+  ctx.strokeStyle = '#ff6b9d'; ctx.lineWidth = 2.5;
+  ctx.beginPath();
+  points.forEach((p, i) => {
+    const x = pad.l + ((p.d - 1) / (DAYS - 1)) * gW;
+    const y = pad.t + gH - ((p.v - minV) / range) * gH;
+    if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+  });
+  ctx.stroke();
+
+  // fill under
+  ctx.beginPath();
+  points.forEach((p, i) => {
+    const x = pad.l + ((p.d - 1) / (DAYS - 1)) * gW;
+    const y = pad.t + gH - ((p.v - minV) / range) * gH;
+    if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+  });
+  const lastX = pad.l + ((points[points.length-1].d - 1) / (DAYS - 1)) * gW;
+  const firstX = pad.l + ((points[0].d - 1) / (DAYS - 1)) * gW;
+  ctx.lineTo(lastX, pad.t + gH);
+  ctx.lineTo(firstX, pad.t + gH);
+  ctx.closePath();
+  const fillGrad = ctx.createLinearGradient(0, pad.t, 0, pad.t + gH);
+  fillGrad.addColorStop(0, 'rgba(255,107,157,0.15)');
+  fillGrad.addColorStop(1, 'rgba(255,107,157,0)');
+  ctx.fillStyle = fillGrad; ctx.fill();
+
+  // dots
+  points.forEach(p => {
+    const x = pad.l + ((p.d - 1) / (DAYS - 1)) * gW;
+    const y = pad.t + gH - ((p.v - minV) / range) * gH;
+    ctx.beginPath(); ctx.arc(x, y, 4, 0, Math.PI*2);
+    ctx.fillStyle = '#ff6b9d'; ctx.fill();
+    ctx.fillStyle = '#ccc'; ctx.font = '9px DM Sans';
+    ctx.fillText(p.v + 'kg', x - 8, y - 8);
+  });
+}
+
+function drawPerHabitChart() {
+  const canvas = document.getElementById('chartPerHabit');
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = canvas.offsetWidth * dpr;
+  canvas.height = 320 * dpr;
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+  const W = canvas.offsetWidth, H = 320;
+  ctx.clearRect(0, 0, W, H);
+
+  const pad = { l: 170, r: 70, t: 16, b: 16 };
+  const gW = W - pad.l - pad.r;
+  const gH = H - pad.t - pad.b;
+  const rowH = gH / HABITS.length;
+  const bH = rowH - 8;
+
+  HABITS.forEach((h, hi) => {
+    let cnt = 0;
+    for (let d = 1; d <= TODAY; d++) { if (ticks[`${hi}_${d}`]) cnt++; }
+    const pct = TODAY > 0 ? cnt / TODAY : 0;
+    const bW = pct * gW;
+    const y = pad.t + hi * rowH + (rowH - bH) / 2;
+
+    ctx.fillStyle = '#888'; ctx.font = '12px DM Sans';
+    ctx.fillText(`${h.icon} ${h.name}`, 4, y + bH/2 + 4);
+
+    ctx.fillStyle = '#1a1a1a';
+    ctx.beginPath(); ctx.roundRect(pad.l, y, gW, bH, 4); ctx.fill();
+
+    if (bW > 2) {
+      const grad = ctx.createLinearGradient(pad.l, 0, pad.l + gW, 0);
+      if (pct >= 0.8) { grad.addColorStop(0, '#ffb3d0'); grad.addColorStop(1, '#ff6b9d'); }
+      else if (pct >= 0.5) { grad.addColorStop(0, '#ff6b9d'); grad.addColorStop(1, '#ff3d7f'); }
+      else { grad.addColorStop(0, '#ff3d7f'); grad.addColorStop(1, '#cc0055'); }
+      ctx.fillStyle = grad;
+      ctx.beginPath(); ctx.roundRect(pad.l, y, bW, bH, 4); ctx.fill();
+    }
+
+    ctx.fillStyle = pct > 0 ? '#aaa' : '#444'; ctx.font = '11px DM Sans';
+    ctx.fillText(`${Math.round(pct*100)}% (${cnt}/${TODAY})`, pad.l + gW + 6, y + bH/2 + 4);
+  });
+}
+
+function showTab(name, btn) {
+  ['tracker','weight','graph','diet'].forEach(n => {
+    document.getElementById(`tab-${n}`).classList.add('hidden');
+  });
+  document.getElementById(`tab-${name}`).classList.remove('hidden');
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  if (name === 'graph') setTimeout(drawGraphs, 60);
+}
+
+function showTabNav(name, btn) {
+  ['tracker','weight','graph','diet'].forEach(n => {
+    document.getElementById(`tab-${n}`).classList.add('hidden');
+    const nb = document.getElementById(`nav-${n}`);
+    if (nb) nb.style.color = '#555';
+  });
+  document.getElementById(`tab-${name}`).classList.remove('hidden');
+  btn.style.color = '#ff6b9d';
+  if (name === 'graph') setTimeout(drawGraphs, 60);
+}
+
+// Motivation quotes for ANGJOK
+const QUOTES = [
+  "Aaj ka effort kal ka result banega, ANGJOK! 🌟",
+  "Ek din ek step — manzil door nahi! 🎯",
+  "Dard temporary hai, pride permanent! 💪",
+  "Tu strong hai, tu capable hai — bas karte reh! 🔥",
+  "Angjok, apne aap pe trust kar — tu kar sakti hai! ✨",
+  "Body change hoti hai consistency se — aaj bhi karo! 🏃",
+  "Har tick mark teri jeet hai, ANGJOK! ✅",
+  "Fitness is not a goal, it's a lifestyle — welcome to yours! 🌸",
+];
+document.getElementById('motiveLine').textContent = QUOTES[new Date().getDate() % QUOTES.length];
+
+// PWA Install
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredPrompt = e;
+  document.getElementById('installBanner').style.display = 'block';
+});
+
+function installApp() {
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt();
+  deferredPrompt.userChoice.then(() => {
+    deferredPrompt = null;
+    document.getElementById('installBanner').style.display = 'none';
+  });
+}
+
+// Init
+buildGrid();
+buildWeightGrid();
+updateStats();
+</script>
+</body>
+</html>
