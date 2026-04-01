@@ -2,8 +2,8 @@
   "name": "ANGJOK Fitness Tracker",
   "short_name": "ANGJOK Fit",
   "description": "ANGJOK ka personal fitness aur weight loss tracker",
-  "start_url": "/index.html",
-  "scope": "/",
+  "start_url": "https://sarkurut24-bit.github.io/Angjok-fitness-/index.html",
+  "scope": "https://sarkurut24-bit.github.io/Angjok-fitness-/",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#0b0b0b",
@@ -11,25 +11,25 @@
   "lang": "en",
   "icons": [
     {
-      "src": "/icon-192.png",
+      "src": "https://sarkurut24-bit.github.io/Angjok-fitness-/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/icon-192.png",
+      "src": "https://sarkurut24-bit.github.io/Angjok-fitness-/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "maskable"
     },
     {
-      "src": "/icon-512.png",
+      "src": "https://sarkurut24-bit.github.io/Angjok-fitness-/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/icon-512.png",
+      "src": "https://sarkurut24-bit.github.io/Angjok-fitness-/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
